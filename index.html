@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="dist/output.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bungee&display=swap"
+      rel="stylesheet"
+    />
+    <title>Happy birth day to My Love</title>
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html,
+    body {
+      overflow: hidden !important;
+      height: 100%;
+      width: 100%;
+    }
+    body {
+      overflow-x: hidden;
+      overflow-y: hidden;
+    }
+    #sky {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+  </style>
+  <body class="overflow-hidden">
+    <div class="relative h-screen overflow-hidden">
+      <audio id="music" loop autoplay>
+        <source
+          src="song/ytmp3free.cc_westlife-beautiful-in-white-youtubemp3free.org.mp3"
+          type="audio/mpeg"
+        />
+      </audio>
+      <div class="flex" style="width: 100%">
+        <div
+          id="leftCurtain"
+          class="absolute left-0 transition-transform duration-1000 ease-[cubic-bezier(.7,0,.3,1)] z-20"
+          style="
+            transform: translateX(0);
+            width: 50%;
+
+            height: 100vh;
+          "
+        >
+          <img
+            src="./img/rem cua 1.png"
+            alt=""
+            style="width: 100%; height: 100vh"
+          />
+        </div>
+        <div
+          id="rightCurtain"
+          class="absolute right-0 transition-transform duration-1000 ease-[cubic-bezier(.7,0,.3,1)] z-20"
+          style="transform: translateX(0); width: 50%; height: 100vh"
+        >
+          <img
+            src="./img/rem cua 1.png"
+            alt=""
+            style="width: 100%; height: 100vh"
+          />
+        </div>
+      </div>
+      <!-- Button -->
+      <div class="fixed inset-0 flex items-center justify-center z-40">
+        <button
+          id="btn"
+          class="heart bg-red-500 text-white px-6 py-3 rounded-lg text-xl hover:bg-red-600 z-40"
+        >
+          <span class="heart-text">Mời công túa mỹ duyên mở ra :33</span>
+        </button>
+      </div>
+      <canvas id="sky"></canvas>
+
+      <div id="scene"></div>
+
+      <div id="cake">
+        <div class="layer layer1"></div>
+        <div class="layer layer2"></div>
+        <div class="layer layer3"></div>
+
+        <div class="candle"></div>
+        <div class="flame"></div>
+      </div>
+
+      <div id="envelope">
+        <div class="env-body"></div>
+        <div class="env-flap"></div>
+      </div>
+
+      <div id="card">
+        <h1>🎂 Happy Birthday 🎂</h1>
+
+        <p>
+          Chúc bạn một sinh nhật thật vui vẻ và ý nghĩa. Mong rằng mọi điều tốt
+          đẹp nhất sẽ đến với bạn hôm nay và trong cả tương lai. Luôn hạnh phúc
+          và mỉm cười ❤️
+        </p>
+        <button id="openGallery" class="galleryBtn">
+          Xem kỷ niệm của chúng ta 📸
+        </button>
+      </div>
+    </div>
+
+    <div id="gallery3d">
+      <canvas id="gallerySky"></canvas>
+      <div class="carousel" id="photoScene">
+        <img src="img/rem cua png.png" class="photo" />
+        <img src="img/tim.png" class="photo" />
+        <img src="img/rem tren png.png" class="photo" />
+        <img src="img/rem tren png.png" class="photo" />
+        <img src="img/rem tren png.png" class="photo" />
+        <img src="img/rem tren png.png" class="photo" />
+      </div>
+    </div>
+
+    <div id="viewer">
+      <img id="viewerImg" />
+    </div>
+
+    <script>
+      const btn = document.getElementById("btn");
+      const leftCurtain = document.getElementById("leftCurtain");
+      const rightCurtain = document.getElementById("rightCurtain");
+      const music = document.getElementById("music");
+
+      btn.addEventListener("click", () => {
+        leftCurtain.style.transform = "translateX(-100%)";
+        rightCurtain.style.transform = "translateX(100%)";
+        btn.style.display = "none";
+        btn.parentElement.style.display = "none";
+        music.play();
+        const isMobile = window.innerWidth < 768;
+        /* SKY */
+
+        const sky = document.getElementById("sky");
+        const ctx = sky.getContext("2d");
+        const DPR = window.devicePixelRatio || 1;
+
+        function resizeSky() {
+          sky.width = window.innerWidth * DPR;
+          sky.height = window.innerHeight * DPR;
+
+          sky.style.width = window.innerWidth + "px";
+          sky.style.height = window.innerHeight + "px";
+
+          ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        }
+
+        resizeSky();
+        window.addEventListener("resize", resizeSky);
+
+        /* STARS */
+
+        const stars = [];
+        const STAR_COUNT = isMobile ? 150 : 400;
+
+        for (let i = 0; i < STAR_COUNT; i++) {
+          stars.push({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            size: Math.random() * 1.2,
+            alpha: Math.random(),
+          });
+        }
+
+        function drawSky() {
+          ctx.fillStyle = "#020617";
+          ctx.fillRect(0, 0, sky.width, sky.height);
+
+          stars.forEach((s) => {
+            ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        }
+
+        /* BUTTERFLY */
+
+        const scene = document.getElementById("scene");
+        const COUNT = isMobile ? 35 : 70;
+        const butterflies = [];
+
+        function createButterfly() {
+          const b = document.createElement("div");
+          b.className = "butterfly";
+
+          b.innerHTML = `
+<div class="wing left"></div>
+<div class="wing right"></div>
+<div class="body"></div>
+`;
+
+          scene.appendChild(b);
+
+          return {
+            el: b,
+            x: (Math.random() - 0.5) * 2000,
+            y: (Math.random() - 0.5) * 2000,
+            z: Math.random() * 2000,
+            tx: 0,
+            ty: 0,
+          };
+        }
+
+        for (let i = 0; i < COUNT; i++) butterflies.push(createButterfly());
+
+        function heart(t) {
+          return {
+            x: 16 * Math.pow(Math.sin(t), 3),
+            y: -(
+              13 * Math.cos(t) -
+              5 * Math.cos(2 * t) -
+              2 * Math.cos(3 * t) -
+              Math.cos(4 * t)
+            ),
+          };
+        }
+
+        function spawnHeart() {
+          let h = document.createElement("div");
+          h.className = "hearts";
+          h.innerHTML = "❤";
+
+          h.style.left = Math.random() * 100 + "vw";
+          h.style.bottom = "-20px";
+          h.style.animationDuration = 4 + Math.random() * 3 + "s";
+
+          document.body.appendChild(h);
+
+          setTimeout(() => h.remove(), 7000);
+        }
+
+        /* ANIMATION */
+
+        let start = null;
+
+        function animate(t) {
+          drawSky();
+
+          if (!start) start = t;
+
+          let time = (t - start) / 1000;
+
+          if (time < 4) {
+            butterflies.forEach((b) => {
+              b.z -= 15;
+
+              let scale = 600 / (600 + b.z);
+
+              let x = window.innerWidth / 2 + b.x * scale;
+              let y = window.innerHeight / 2 + b.y * scale;
+
+              b.el.style.transform = `translate(${x}px,${y}px) scale(${scale})`;
+            });
+          } else if (time < 7) {
+            butterflies.forEach((b, i) => {
+              let tt = (i / COUNT) * Math.PI * 2;
+              let pos = heart(tt);
+
+              let s = Math.min(window.innerWidth, window.innerHeight) / 35;
+
+              b.tx = window.innerWidth / 2 + pos.x * s;
+              b.ty = window.innerHeight / 2 + pos.y * s;
+
+              b.x += (b.tx - b.x) * 0.05;
+              b.y += (b.ty - b.y) * 0.05;
+
+              b.el.style.transform = `translate(${b.x}px,${b.y}px)`;
+            });
+          } else if (time < 10) {
+            document.getElementById("cake").classList.add("show");
+
+            butterflies.forEach((b) => {
+              b.el.style.opacity = 0;
+            });
+          } else if (time < 11) {
+            document.getElementById("envelope").classList.add("show");
+          } else if (time < 12) {
+            document.getElementById("envelope").classList.add("open");
+          } else {
+            document.getElementById("card").classList.add("show");
+
+            if (Math.random() < 0.3) spawnHeart();
+          }
+
+          requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+      });
+      // =====================
+
+      const openGallery = document.getElementById("openGallery");
+      const gallery3d = document.getElementById("gallery3d");
+      const photos = document.querySelectorAll(".photo");
+
+      const viewer = document.getElementById("viewer");
+      const viewerImg = document.getElementById("viewerImg");
+
+      const gallerySky = document.getElementById("gallerySky");
+      const gctx = gallerySky.getContext("2d");
+
+      let gStars = [];
+      let gMeteors = [];
+
+      function resizeGallerySky() {
+        gallerySky.width = window.innerWidth;
+        gallerySky.height = window.innerHeight;
+        gallerySky.style.width = "100vw";
+        gallerySky.style.height = "100vh";
+      }
+
+      resizeGallerySky();
+      window.addEventListener("resize", resizeGallerySky);
+
+      function createStars() {
+        gStars = [];
+
+        for (let i = 0; i < 300; i++) {
+          gStars.push({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            size: Math.random() * 1.5,
+            alpha: Math.random(),
+            speed: Math.random() * 0.02,
+          });
+        }
+      }
+
+      createStars();
+
+      function spawnMeteor() {
+        gMeteors.push({
+          x: -100, // bắt đầu ngoài bên trái
+          y: Math.random() * window.innerHeight * 0.3, // bắt đầu gần phía trên
+          len: Math.random() * 120 + 60,
+          speed: Math.random() * 6 + 6,
+        });
+      }
+
+      function drawGallerySky() {
+        gctx.fillStyle = "#020617";
+        gctx.fillRect(0, 0, gallerySky.width, gallerySky.height);
+
+        gStars.forEach((s) => {
+          s.alpha += s.speed;
+
+          if (s.alpha > 1 || s.alpha < 0.2) {
+            s.speed *= -1;
+          }
+
+          gctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+
+          gctx.beginPath();
+          gctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+          gctx.fill();
+        });
+
+        gMeteors.forEach((m, i) => {
+          const gradient = gctx.createLinearGradient(
+            m.x,
+            m.y,
+            m.x - m.len,
+            m.y - m.len,
+          );
+
+          gradient.addColorStop(0, "rgba(255,255,255,1)");
+          gradient.addColorStop(1, "rgba(255,255,255,0)");
+
+          gctx.strokeStyle = gradient;
+          gctx.lineWidth = 2;
+
+          gctx.beginPath();
+          gctx.moveTo(m.x, m.y);
+          gctx.lineTo(m.x - m.len, m.y - m.len);
+          gctx.stroke();
+
+          // chuyển động
+          m.x += m.speed; // sang phải
+          m.y += m.speed * 0.8; // đi xuống
+
+          if (m.x > window.innerWidth + 200 || m.y > window.innerHeight + 200) {
+            gMeteors.splice(i, 1);
+          }
+        });
+
+        if (Math.random() < 0.02) {
+          spawnMeteor();
+        }
+
+        requestAnimationFrame(drawGallerySky);
+      }
+
+      openGallery.onclick = () => {
+        const card = document.getElementById("card");
+        const envelope = document.getElementById("envelope");
+
+        // 1️⃣ Ẩn thiệp + thư
+        card.style.opacity = 0;
+        envelope.style.opacity = 0;
+
+        setTimeout(() => {
+          card.style.display = "none";
+          envelope.style.display = "none";
+
+          startPhotoRain();
+        }, 800);
+      };
+
+      function startPhotoRain() {
+        const original = [...photos];
+
+        const total = original.length * 3;
+
+        let created = 0;
+
+        const rain = setInterval(() => {
+          const img = original[Math.floor(Math.random() * original.length)];
+
+          const clone = img.cloneNode();
+
+          clone.classList.remove("photo");
+          clone.classList.add("fallPhoto");
+
+          clone.style.left = Math.random() * window.innerWidth + "px";
+          clone.style.top = "-250px";
+
+          document.body.appendChild(clone);
+
+          // bắt đầu rơi
+          setTimeout(() => {
+            const depth = Math.random() * 800 - 400;
+            // âm = xa, dương = gần
+
+            const y = window.innerHeight + 300;
+
+            const rotX = (Math.random() - 0.5) * 60;
+            const rotY = (Math.random() - 0.5) * 60;
+            const rotZ = (Math.random() - 0.5) * 120;
+
+            const scale = 0.6 + Math.random() * 0.8;
+
+            clone.style.opacity = 1;
+
+            clone.style.transform = `
+    translateY(${y}px)
+    translateZ(${depth}px)
+    rotateX(${rotX}deg)
+    rotateY(${rotY}deg)
+    rotateZ(${rotZ}deg)
+    scale(${scale})
+  `;
+          }, 30);
+
+          // chạm đất -> biến mất
+          setTimeout(() => {
+            clone.style.opacity = 0;
+
+            setTimeout(() => {
+              clone.remove();
+            }, 800);
+          }, 2800);
+
+          created++;
+
+          if (created >= total) {
+            clearInterval(rain);
+
+            // sau khi mưa xong -> hiện gallery
+            setTimeout(() => {
+              gallery3d.style.display = "flex";
+
+              drawGallerySky();
+            }, 3000);
+          }
+        }, 400);
+      }
+
+      photos.forEach((p) => {
+        p.onclick = () => {
+          viewer.style.display = "flex";
+          viewerImg.src = p.src;
+        };
+      });
+
+      viewer.onclick = () => {
+        viewer.style.display = "none";
+      };
+    </script>
+  </body>
+</html>
